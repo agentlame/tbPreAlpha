@@ -5,6 +5,8 @@ using System.Text;
 
 using Xamarin.Forms;
 using RedditSharp;
+using TB.UI;
+using TB.Core;
 
 namespace TB
 {
@@ -12,24 +14,30 @@ namespace TB
     {
         public App()
         {
-            var reddit = new Reddit();
-            var user = reddit.LogIn(TB.Properties.Resources.REDDIT_USERNAME, TB.Properties.Resources.REDDIT_PASSWORD);
-            var subreddit = reddit.GetSubreddit("/r/al_dev");
+            var username = Settings.REDDIT_USERNAME;
+            var password = Settings.REDDIT_PASSWORD;
 
-            // The root page of your application
-            MainPage = new ContentPage
+            // If the settings are empty, we've never logged in.
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                Content = new StackLayout
+                MainPage = new NavigationPage(new Login());
+                //MainPage = new NavigationPage(new Home());
+            }
+            else
+            {
+                State.Reddit = new Reddit();
+                try
                 {
-                    VerticalOptions = LayoutOptions.Center,
-                    Children = {
-                        new Label {
-                            XAlign = TextAlignment.Center,
-                            Text = subreddit.Name //"Welcome to Xamarin Forms!"
-                        }
-                    }
+                    State.Reddit.LogIn(username, password, true);
                 }
-            };
+                catch
+                {
+                    // Saved password didn't work, so show login form anyways.
+                    MainPage = new NavigationPage(new Login());
+                }
+
+                MainPage = new NavigationPage(new Home());
+            }
         }
 
         protected override void OnStart()
