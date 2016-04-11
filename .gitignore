@@ -279,3 +279,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Don't commit passwords.
+TB/TB/Properties/Resources.Designer.cs
+TB/TB/Properties/Resources.resx
